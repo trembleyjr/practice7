@@ -1,0 +1,54 @@
+---
+title: "Practice7"
+author: "Joseph Trembley"
+date: "3/30/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+GitHub Repo: https://github.com/trembleyjr/practice7
+
+```{r cars}
+library(tidyverse)
+av <- read.csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/avengers/avengers.csv", stringsAsFactors = FALSE)
+View(av)
+```
+
+```{r}
+av <- av %>% filter(Name.Alias != "")
+av <- av %>% filter(Name.Alias != "Vance Astrovik")
+av1 <- av %>% mutate(Death = as.factor(Death1), Time = case_when(
+  Death5 == "YES" ~ 5,
+  Death4 == "YES" ~ 4,
+  Death3 == "YES" ~ 3,
+  Death2 == "YES" ~ 2,
+  Death1 == "YES" ~ 1,
+  Death1 == "NO" ~ 0
+))
+av1 <- av1 %>% select(Name.Alias, Time, Death)
+av2 <- av %>% mutate(Return = as.factor(Return1), Time = case_when(
+  Return5 == "YES" ~ 5,
+  Return4 == "YES" ~ 4,
+  Return3 == "YES" ~ 3,
+  Return2 == "YES" ~ 2,
+  Return1 == "YES" ~ 1,
+  Return1 == "NO" ~ 0
+))
+av2 = av2 %>% select(Name.Alias, Time, Return)
+av3 = left_join(av1, av2, by = c("Name.Alias", "Time"))
+
+```
+
+Claim proposed: There is only about a 50% chance an Avenger returns for their second or third death.
+
+```{r}
+av4 = av3 %>% filter((Time == 2 | Time == 3))
+av5 = av4 %>% filter(Return == "YES")
+percentReturn = nrow(av5)/nrow(av4)
+percentReturn
+```
+
+The claim may be accurate depending on the definition of about.  In my own interpretation, I would not say that the actual value of 42.857% is close to 50%, so I consider the claim for this statement to be false.
